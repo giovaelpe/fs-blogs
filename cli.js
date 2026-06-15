@@ -33,6 +33,7 @@ Blog.init({
     timestamps: false,
     modelName: 'blogs'
 });
+Blog.sync();
 
 const main = async () => {
     try {
@@ -45,4 +46,8 @@ const main = async () => {
         console.log(error);
     }
 }
-main();
+
+module.exports = {
+    main,
+    Blog
+};
