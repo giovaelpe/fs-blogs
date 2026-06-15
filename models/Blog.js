@@ -10,7 +10,8 @@ Blog.init({
         autoIncrement: true
     },
     author: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        allowNull: false
     },
     url :{
         type: DataTypes.TEXT,
