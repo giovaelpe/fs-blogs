@@ -5,13 +5,7 @@ const bcrypt = require('bcrypt');
 const {BCRYPT_SALT, SECRET} = require('../util/config');
 const jwt = require('jsonwebtoken');
 
-const errorHandler = (error, req, res, next) => {
-    console.log(error.message);
-    if(error.errors[0].validatorKey === 'isEmail'){
-        return res.status(400).json({error: "username must be a valid email address"})
-    }
-    res.status(400).json({error: error.message});
-}
+
 
 const tokenExtractor = (req, res, next) => {
     const authorization = req.get('authorization')
@@ -26,6 +20,17 @@ const tokenExtractor = (req, res, next) => {
     }
     next();
 }
+
+
+
+const errorHandler = (error, req, res, next) => {
+    console.log(error.message);
+    if(error.errors[0].validatorKey === 'isEmail'){
+        return res.status(400).json({error: "username must be a valid email address"})
+    }
+    res.status(400).json({error: error.message});
+}
+
 
 userRouter.get("/", async(req, res) => {
     const users = await User.findAll({
@@ -97,4 +102,7 @@ userRouter.put("/update", tokenExtractor, async(req, res) => {
 })
 
 userRouter.use(errorHandler);
-module.exports = userRouter;
+module.exports = {
+    userRouter,
+    tokenExtractor
+};

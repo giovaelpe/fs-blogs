@@ -1,6 +1,8 @@
 const express = require('express');
 const blogRouter = express.Router();
 const {Blog} = require('../models/index');
+const {User} = require('../models/index');
+const {tokenExtractor} = require('./users');
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id);
@@ -29,10 +31,22 @@ blogRouter.get('/:id', blogFinder, async (req, res) => {
     res.json(req.blog);
 })
 
-blogRouter.post("/", async (req, res, next) => {
+blogRouter.post("/", tokenExtractor, async (req, res, next) => {
+    const user = await User.findOne({
+        where : {
+            id : req.decodedToken.id
+        },
+        attributes : {
+            exclude: ['password']
+        }
+    });
+
+    if(!user) {
+        return res.status(404).json({error: "Invalid user"});
+    }
 
     try {
-        const blog = await Blog.create({ ...req.body });
+        const blog = await Blog.create({ ...req.body, userId: req.decodedToken.id });
         return res.json(blog);
     } catch (error) {
         next(error);

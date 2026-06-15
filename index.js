@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const blogRouter = require('./controllers/blogs.js')
-const userRouter = require('./controllers/users.js');
+const {userRouter} = require('./controllers/users.js');
 const {DATABASE_URL, PORT} = require('./util/config.js');
 
 app.use(express.json());
