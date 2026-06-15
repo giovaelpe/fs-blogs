@@ -2,7 +2,7 @@ const express = require('express');
 const blogRouter = express.Router();
 const {Blog} = require('../models/index');
 const {User} = require('../models/index');
-const {tokenExtractor} = require('./users');
+const {tokenExtractor, userFinder} = require('./users');
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id);
@@ -53,9 +53,12 @@ blogRouter.post("/", tokenExtractor, async (req, res, next) => {
     }
 })
 
-blogRouter.delete("/:id", blogFinder, async (req, res) => {
+blogRouter.delete("/:id", blogFinder, tokenExtractor, userFinder, async (req, res) => {
+    if(req.user.id != req.blog.userId){
+        return res.status(401).json({error: "Not allowed"})
+    }
     await req.blog.destroy();
-    return res.status(204).json(blog);
+    return res.status(204).end();
 });
 
 blogRouter.put('/:id', blogFinder, async (req, res, next) => {
