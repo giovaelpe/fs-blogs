@@ -1,7 +1,11 @@
 const {Sequelize} = require('sequelize');
-const {DATABASE_URL} = require('../util/config');
+const {DATABASE_URL, TEST_DATABASE_URL} = require('../util/config');
 
-const sequelize = new Sequelize(DATABASE_URL, {
+const isTesting = process.env.TESTING === true;
+
+const dbUrl = isTesting? TEST_DATABASE_URL : DATABASE_URL;
+
+const sequelize = new Sequelize(dbUrl, {
     dialect: 'postgres'
 });
 
