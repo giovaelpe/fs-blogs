@@ -39,7 +39,6 @@ jobs:
       - name: Start application
         run: npm run start:test > app.log 2>&1 &
         env:
-          TESTING: true
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db?sslmode=disable
           PORT: 3001
           SECRET: test_secret
@@ -50,7 +49,6 @@ jobs:
       - name: Run tests
         run: npm test
         env:
-          TESTING: true
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db?sslmode=disable
           PORT: 3001
           SECRET: test_secret

@@ -5,7 +5,7 @@ const isTesting = process.env.TESTING === true;
 
 const dbUrl = isTesting? TEST_DATABASE_URL : DATABASE_URL;
 
-const sequelize = new Sequelize(dbUrl, {
+const sequelize = new Sequelize("postgres://postgres:123@localhost:5432/tests_db", {
     dialect: 'postgres'
 });
 
