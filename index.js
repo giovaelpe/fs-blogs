@@ -26,6 +26,6 @@ app.post("/deleteall", (req, res) => {
 const puerto = PORT || 3001;
 
 app.listen(puerto, () => {
-    console.log("Server running in port 3011");
+    console.log("Server running in port 3001");
 })
 
