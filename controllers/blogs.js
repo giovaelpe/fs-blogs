@@ -1,8 +1,9 @@
 const express = require('express');
 const blogRouter = express.Router();
-const {Blog} = require('../models/index');
-const {User} = require('../models/index');
-const {tokenExtractor, userFinder} = require('./users');
+const { Blog } = require('../models/index');
+const { User } = require('../models/index');
+const { tokenExtractor, userFinder } = require('./users');
+const { Op } = require('sequelize');
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id);
@@ -21,7 +22,32 @@ const errorHandler = (error, req, res, next) => {
 
 
 blogRouter.get("/", async (req, res) => {
-    const blogs = await Blog.findAll();
+    let where = {};
+    if (req.query.search) {
+        where = {
+            [Op.or]: [
+                {
+                    title: {[Op.iLike] : `%${req.query.search}%`}
+                },
+                {
+                    author: {[Op.iLike] : `%${req.query.search}%`}
+                }
+            ]
+        }
+    }
+    const blogs = await Blog.findAll({
+        attributes: {
+            exclude: ['userId']
+        },
+        include: {
+            model: User,
+            attributes: ['name']
+        },
+        order :[
+            ['likes', 'DESC']
+        ],
+        where
+    });
     res.json(blogs);
 })
 
@@ -33,16 +59,16 @@ blogRouter.get('/:id', blogFinder, async (req, res) => {
 
 blogRouter.post("/", tokenExtractor, async (req, res, next) => {
     const user = await User.findOne({
-        where : {
-            id : req.decodedToken.id
+        where: {
+            id: req.decodedToken.id
         },
-        attributes : {
+        attributes: {
             exclude: ['password']
         }
     });
 
-    if(!user) {
-        return res.status(404).json({error: "Invalid user"});
+    if (!user) {
+        return res.status(404).json({ error: "Invalid user" });
     }
 
     try {
@@ -54,19 +80,22 @@ blogRouter.post("/", tokenExtractor, async (req, res, next) => {
 })
 
 blogRouter.delete("/:id", blogFinder, tokenExtractor, userFinder, async (req, res) => {
-    if(req.user.id != req.blog.userId){
-        return res.status(401).json({error: "Not allowed"})
+    if (req.user.id != req.blog.userId) {
+        return res.status(401).json({ error: "Not allowed" })
     }
     await req.blog.destroy();
     return res.status(204).end();
 });
 
 blogRouter.put('/:id', blogFinder, async (req, res, next) => {
+    if(!req.body.likes){
+        return res.status(400).json({error: "likes required"});
+    }
     try {
         req.blog.likes = req.body.likes;
         await req.blog.save();
         return res.json(req.blog);
-    } catch(error) {
+    } catch (error) {
         next(error);
     }
 })

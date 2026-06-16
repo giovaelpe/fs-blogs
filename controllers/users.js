@@ -1,6 +1,7 @@
 const express = require('express');
 const userRouter = express.Router();
 const { User } = require('../models/index');
+const Blog = require('../models/Blog');
 const bcrypt = require('bcrypt');
 const { BCRYPT_SALT, SECRET } = require('../util/config');
 const jwt = require('jsonwebtoken');
@@ -52,6 +53,12 @@ userRouter.get("/", async (req, res) => {
     const users = await User.findAll({
         attributes: {
             exclude: ['password']
+        },
+        include: {
+            model: Blog,
+            attributes: {
+                exclude: ['userId']
+            }
         }
     });
     res.json(users);
