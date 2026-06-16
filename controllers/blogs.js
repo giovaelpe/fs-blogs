@@ -3,7 +3,7 @@ const blogRouter = express.Router();
 const { Blog } = require('../models/index');
 const { User } = require('../models/index');
 const { tokenExtractor, userFinder } = require('./users');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id);
@@ -47,6 +47,17 @@ blogRouter.get("/", async (req, res) => {
             ['likes', 'DESC']
         ],
         where
+    });
+    res.json(blogs);
+})
+
+blogRouter.get('/authors', async(req, res) => {
+    const blogs = await Blog.findAll({
+       attributes: [
+        'author', [Sequelize.fn('COUNT', Sequelize.col('id')), 'Number of blogs'],
+        [Sequelize.fn('SUM', Sequelize.col('likes')), 'Likes']
+       ],
+       group: ['author'],
     });
     res.json(blogs);
 })
