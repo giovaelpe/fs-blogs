@@ -9,7 +9,7 @@
   "scripts": {
     "start": "nodemon index.js",
     "test": "TESTING=true node --test --test-concurrency=1 tests/api_ch3.test.js",
-    "start:test": "TESTING=true node index.js"
+    "start:test": "node index.js"
   },
   "devDependencies": {
     "dotenv": "^17.4.2",
