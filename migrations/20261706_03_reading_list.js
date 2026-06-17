@@ -6,7 +6,7 @@ module.exports = {
             id: {
                 primaryKey: true,
                 type: DataTypes.INTEGER,
-                autoincrement: true
+                autoIncrement: true
             },
             blog_id : {
                 type: DataTypes.INTEGER,

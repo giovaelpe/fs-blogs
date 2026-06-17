@@ -7,9 +7,9 @@ ReadingList.init({
     id: {
         primaryKey: true,
         type: DataTypes.INTEGER,
-        autoincrement: true
+        autoIncrement: true
     },
-    blog_id: {
+    blogId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

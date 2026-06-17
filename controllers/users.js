@@ -5,6 +5,7 @@ const Blog = require('../models/Blog');
 const bcrypt = require('bcrypt');
 const { BCRYPT_SALT, SECRET } = require('../util/config');
 const jwt = require('jsonwebtoken');
+const { Model } = require('sequelize');
 
 
 
@@ -62,6 +63,31 @@ userRouter.get("/", async (req, res) => {
         }
     });
     res.json(users);
+})
+
+
+userRouter.get("/:id", async(req, res) => {
+    const user = await User.findByPk(req.params.id, {
+        attributes: {
+            exclude: ["password", "createdAt", "updatedAt", "id"],
+        },
+        include : [
+            {
+                model: Blog,
+                as: "readings",
+                through: {
+                    attributes: []
+                },
+                attributes : {
+                    exclude: ["user_id", "userId"]
+                }
+            }
+        ]
+    });
+    if(!user) {
+        return res.status(404).json({error: "User not found"});
+    }
+    res.json(user);
 })
 
 

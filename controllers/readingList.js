@@ -12,7 +12,7 @@ listRouter.post('/', async(req, res) => {
     if(!user || !blog) {
         return res.status(404).json({error: "Not found"});
     }
-    const newItem = await ReadingList.create({userId, blogId});
+    const newItem = await ReadingList.create({userId : userId, blogId: blogId});
     res.status(201).json(newItem);
 });
 
