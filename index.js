@@ -14,7 +14,7 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
 
 app.get("/", (req, res) => {
-    res.status(200).send('ok');
+    res.sendStatus(200);
 });
 
 app.post("/reset", (req, res) => {
