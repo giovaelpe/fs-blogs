@@ -32,6 +32,7 @@ ReadingList.init({
 },
     {
         sequelize,
+        tableName: "reading_list",
         timestamps: true,
         underscored: true,
         modelName: 'reading_list'

@@ -23,6 +23,12 @@ module.exports = {
                     model: 'users',
                     key: 'id'
                 }
+            },
+            created_at : {
+                type: DataTypes.DATE
+            },
+            updated_at : {
+                type: DataTypes.DATE
             }
         })
     },

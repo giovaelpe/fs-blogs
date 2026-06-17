@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const blogRouter = require('./controllers/blogs.js')
 const { userRouter } = require('./controllers/users.js');
+const listRouter = require('./controllers/readingList.js');
 const { DATABASE_URL, PORT, TEST_DATABASE_URL } = require('./util/config.js');
 const User = require('./models/User.js');
 const Blog = require('./models/Blog.js');
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
+app.use("/api/readinglist", listRouter);
 
 app.get("/", (req, res) => {
     res.sendStatus(200);
