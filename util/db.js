@@ -1,7 +1,7 @@
 const {Sequelize} = require('sequelize');
 const {DATABASE_URL, TEST_DATABASE_URL} = require('../util/config');
 
-const isTesting = process.env.TESTING == true;
+const isTesting = process.env.TESTING? true : false;
 
 const dbUrl = isTesting? TEST_DATABASE_URL : DATABASE_URL;
 
