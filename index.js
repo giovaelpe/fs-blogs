@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
     res.status(200).send('ok');
 });
 
-app.post("/deleteall", (req, res) => {
+app.post("/reset", (req, res) => {
     Blog.destroy();
     User.destroy();
     res.status(204).end();
