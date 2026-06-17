@@ -48,7 +48,7 @@ blogRouter.get("/", async (req, res) => {
         ],
         where
     });
-    res.json(blogs);
+    res.status(200).json(blogs);
 })
 
 blogRouter.get('/authors', async(req, res) => {

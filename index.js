@@ -17,9 +17,9 @@ app.get("/", (req, res) => {
     res.sendStatus(200);
 });
 
-app.post("/reset", (req, res) => {
-    Blog.destroy();
-    User.destroy();
+app.post("/api/reset", (req, res) => {
+    Blog.destroy({where: {}});
+    User.destroy({where: {}});
     res.status(204).end();
 })
 

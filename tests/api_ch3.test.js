@@ -12,8 +12,6 @@ before(async () => {
 describe('Blogs API', () => {
   it('blogs are returned as json and initially empty', async () => {
     const response = await axios.get(`${baseUrl}/blogs`)
-    console.log(response.status);
-    console.log(response.data);
     assert.ok([200, 201].includes(response.status))
     assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8')
     assert.strictEqual(Array.isArray(response.data), true)
@@ -30,9 +28,6 @@ describe('Blogs API', () => {
     const response = await axios.post(`${baseUrl}/blogs`, newBlog, {
       headers: { Authorization: `Bearer ${testData.tokens[0]}` }
     })
-
-    console.log(response.status);
-    console.log(response.data);
 
     assert.ok([200, 201].includes(response.status))
     assert.strictEqual(response.data.title, newBlog.title)
