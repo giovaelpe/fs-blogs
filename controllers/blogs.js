@@ -54,8 +54,8 @@ blogRouter.get("/", async (req, res) => {
 blogRouter.get('/authors', async(req, res) => {
     const blogs = await Blog.findAll({
        attributes: [
-        'author', [Sequelize.fn('COUNT', Sequelize.col('id')), 'Number of blogs'],
-        [Sequelize.fn('SUM', Sequelize.col('likes')), 'Likes']
+        'author', [Sequelize.fn('COUNT', Sequelize.col('id')), 'blogs'],
+        [Sequelize.fn('SUM', Sequelize.col('likes')), 'likes']
        ],
        group: ['author'],
     });

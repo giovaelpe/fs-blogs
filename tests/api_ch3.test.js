@@ -76,13 +76,13 @@ describe('Users API', () => {
 
 describe('Authors API', () => {
   it('returns author statistics', async () => {
-    const response = await axios.get(`${baseUrl}/authors`)
+    const response = await axios.get(`${baseUrl}/blogs/authors`)
     assert.ok([200, 201].includes(response.status))
     assert.strictEqual(Array.isArray(response.data), true)
   })
 
   it('author stats have correct structure', async () => {
-    const response = await axios.get(`${baseUrl}/authors`)
+    const response = await axios.get(`${baseUrl}/blogs/authors`)
     
     if (response.data.length > 0) {
       const author = response.data[0]
