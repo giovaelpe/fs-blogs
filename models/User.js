@@ -30,7 +30,7 @@ User.init({
     sequelize,
     timestamps: true,
     underscored: true,
-    modelName: 'users'
+    modelName: 'users',
 });
 
 module.exports = User;

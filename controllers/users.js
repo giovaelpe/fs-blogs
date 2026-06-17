@@ -42,7 +42,7 @@ const userFinder = async(req, res, next) => {
 
 const errorHandler = (error, req, res, next) => {
     console.log(error.message);
-    if (error.errors[0].validatorKey === 'isEmail') {
+    if (error.errors[0] && error.errors[0].validatorKey === 'isEmail') {
         return res.status(400).json({ error: "username must be a valid email address" })
     }
     res.status(400).json({ error: error.message });

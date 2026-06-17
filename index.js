@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
 const blogRouter = require('./controllers/blogs.js')
-const {userRouter} = require('./controllers/users.js');
-const {DATABASE_URL, PORT, TEST_DATABASE_URL} = require('./util/config.js');
+const { userRouter } = require('./controllers/users.js');
+const { DATABASE_URL, PORT, TEST_DATABASE_URL } = require('./util/config.js');
 const User = require('./models/User.js');
 const Blog = require('./models/Blog.js');
+const { connectToDb } = require('./util/db.js');
 
 app.use(express.json());
 
@@ -18,14 +19,19 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/reset", (req, res) => {
-    Blog.destroy({where: {}});
-    User.destroy({where: {}});
+    Blog.destroy({ where: {} });
+    User.destroy({ where: {} });
     res.status(204).end();
 })
 
 const puerto = PORT || 3001;
 
-app.listen(puerto, () => {
-    console.log("Server running in port 3001");
-})
+const start = async () => {
+    await connectToDb()
+    app.listen(puerto, () => {
+        console.log("Server running in port 3001");
+    })
+}
+
+start();
 

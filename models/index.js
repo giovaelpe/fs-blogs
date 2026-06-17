@@ -7,7 +7,7 @@ Blog.belongsTo(User);
 
 //Blog.sync({alter: true});
 //User.sync({alter: true});
-sequelize.sync({alter: true});
+//sequelize.sync({alter: true});
 
 module.exports = {
     Blog,
