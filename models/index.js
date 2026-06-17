@@ -1,15 +1,17 @@
 const Blog = require('./Blog');
 const User = require('./User');
-const {sequelize} = require('../util/db');
+const ReadingList = require('./ReadingList');
 
 User.hasMany(Blog);
 Blog.belongsTo(User);
 
-//Blog.sync({alter: true});
-//User.sync({alter: true});
-//sequelize.sync({alter: true});
+User.belongsToMany(Blog, {through: ReadingList});
+Blog.belongsToMany(User, {through: ReadingList});
+
+
 
 module.exports = {
     Blog,
-    User
+    User,
+    ReadingList
 }
