@@ -24,6 +24,10 @@ User.init({
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    enabled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     }
 },
 {

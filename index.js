@@ -3,12 +3,26 @@ const app = express();
 const blogRouter = require('./controllers/blogs.js')
 const { userRouter } = require('./controllers/users.js');
 const listRouter = require('./controllers/readingList.js');
-const { DATABASE_URL, PORT, TEST_DATABASE_URL } = require('./util/config.js');
+const { DATABASE_URL, PORT, TEST_DATABASE_URL, SECRET } = require('./util/config.js');
 const User = require('./models/User.js');
 const Blog = require('./models/Blog.js');
-const { connectToDb } = require('./util/db.js');
+const { connectToDb, sequelize } = require('./util/db.js');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const myStore = new SequelizeStore({db: sequelize, expiration: 24 * 60 *60 *1000})
+
 
 app.use(express.json());
+
+app.use(
+    session({
+        secret: SECRET,
+        store: myStore,
+        resave: false
+    })
+);
+
+myStore.sync();
 
 
 

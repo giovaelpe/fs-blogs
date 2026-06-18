@@ -53,7 +53,7 @@ const errorHandler = (error, req, res, next) => {
 userRouter.get("/", async (req, res) => {
     const users = await User.findAll({
         attributes: {
-            exclude: ['password']
+            exclude: ['password', 'enabled']
         },
         include: {
             model: Blog,
@@ -80,7 +80,7 @@ userRouter.get("/:id", async (req, res, next) => {
     try {
         const user = await User.findByPk(req.params.id, {
             attributes: {
-                exclude: ["password", "createdAt", "updatedAt", "id"],
+                exclude: ["password", "createdAt", "updatedAt", "id", "enabled"],
             },
             include: [
                 {
