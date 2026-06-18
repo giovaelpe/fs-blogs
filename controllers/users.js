@@ -138,12 +138,21 @@ userRouter.post("/login", async (req, res, next) => {
         id: user.id
     };
     const token = await jwt.sign(forToken, SECRET);
+    req.session.user = {
+        username: user.username
+    }
     res.status(200).json({
         token,
         username: user.username,
         name: user.name
     });
 });
+
+userRouter.delete("/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.json({message: "Logged out"})
+    });
+})
 
 userRouter.put("/update", tokenExtractor, userFinder, async (req, res) => {
     req.user.username = req.body.username;
