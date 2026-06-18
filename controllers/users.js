@@ -5,7 +5,7 @@ const Blog = require('../models/Blog');
 const bcrypt = require('bcrypt');
 const { BCRYPT_SALT, SECRET } = require('../util/config');
 const jwt = require('jsonwebtoken');
-const { Model } = require('sequelize');
+const { Model, where } = require('sequelize');
 
 
 
@@ -23,7 +23,7 @@ const tokenExtractor = (req, res, next) => {
     next();
 }
 
-const userFinder = async(req, res, next) => {
+const userFinder = async (req, res, next) => {
     user = await User.findOne({
         where: {
             id: req.decodedToken.id
@@ -66,28 +66,40 @@ userRouter.get("/", async (req, res) => {
 })
 
 
-userRouter.get("/:id", async(req, res) => {
-    const user = await User.findByPk(req.params.id, {
-        attributes: {
-            exclude: ["password", "createdAt", "updatedAt", "id"],
-        },
-        include : [
-            {
-                model: Blog,
-                as: "readings",
-                through: {
-                    attributes: []
-                },
-                attributes : {
-                    exclude: ["user_id", "userId"]
-                }
-            }
-        ]
-    });
-    if(!user) {
-        return res.status(404).json({error: "User not found"});
+userRouter.get("/:id", async (req, res, next) => {
+    const through = {
+        attributes: ["read", "id"],
+        where : {}
     }
-    res.json(user);
+    if(req.query.read === "true") {
+        through.where = {read:true}
+    }
+    if(req.query.read === "false"){
+        through.where = {read:false}
+    }
+    try {
+        const user = await User.findByPk(req.params.id, {
+            attributes: {
+                exclude: ["password", "createdAt", "updatedAt", "id"],
+            },
+            include: [
+                {
+                    model: Blog,
+                    as: "readings",
+                    through,
+                    attributes: {
+                        exclude: ["user_id", "userId"]
+                    }
+                }
+            ]
+        });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.json(user);
+    } catch (err) {
+        next(err);
+    }
 })
 
 

@@ -25,7 +25,7 @@ ReadingList.init({
             key: 'id'
         }
     },
-    unread : {
+    read : {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     }
