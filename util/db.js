@@ -7,8 +7,7 @@ const isTesting = process.env.TESTING? true : false;
 const dbUrl = isTesting? TEST_DATABASE_URL : DATABASE_URL;
 
 const sequelize = new Sequelize(dbUrl, {
-    dialect: 'postgres',
-    logging: false
+    dialect: 'postgres'
 });
 
 const runMigrations = async() => {

@@ -4,6 +4,7 @@ const { Blog } = require('../models/index');
 const { User } = require('../models/index');
 const { tokenExtractor, userFinder } = require('./users');
 const { Op, Sequelize } = require('sequelize');
+const Sessions = require('../models/Sessions');
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id);
@@ -80,6 +81,15 @@ blogRouter.post("/", tokenExtractor, async (req, res, next) => {
 
     if (!user) {
         return res.status(404).json({ error: "Invalid user" });
+    }
+
+    const sessionToken = await Sessions.findOne({
+        where : {
+            token : req.token
+        }
+    })
+    if(!sessionToken.enabled){
+        return res.status(401).json({error: "Token disabled"});
     }
     
     try {

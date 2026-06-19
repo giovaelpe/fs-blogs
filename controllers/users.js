@@ -2,6 +2,7 @@ const express = require('express');
 const userRouter = express.Router();
 const { User } = require('../models/index');
 const Blog = require('../models/Blog');
+const Sessions = require('../models/Sessions')
 const bcrypt = require('bcrypt');
 const { BCRYPT_SALT, SECRET } = require('../util/config');
 const jwt = require('jsonwebtoken');
@@ -14,6 +15,7 @@ const tokenExtractor = (req, res, next) => {
     if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
         try {
             req.decodedToken = jwt.verify(authorization.substring(7), SECRET);
+            req.token = authorization.substring(7);
         } catch (error) {
             return res.status(401).json({ error: 'token invalid' })
         }
@@ -137,7 +139,8 @@ userRouter.post("/login", async (req, res, next) => {
         username: user.username,
         id: user.id
     };
-    const token = await jwt.sign(forToken, SECRET);
+    const token = await jwt.sign(forToken, SECRET, {expiresIn: "1h"});
+    await Sessions.create({token});
     res.status(200).json({
         token,
         username: user.username,
@@ -145,8 +148,18 @@ userRouter.post("/login", async (req, res, next) => {
     });
 });
 
-userRouter.delete("/logout", (req, res) => {
-    res.send(ok);
+userRouter.delete("/logout", tokenExtractor, async(req, res) => {
+    const sessionToken = await Sessions.findOne({
+        where: {
+            token : req.token
+        }
+    });
+    if(!sessionToken){
+        return res.sendStatus(404);
+    }
+    sessionToken.enabled = false;
+    await sessionToken.save();
+    res.sendStatus(201);
 })
 
 userRouter.put("/update", tokenExtractor, userFinder, async (req, res) => {
