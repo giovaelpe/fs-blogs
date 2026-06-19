@@ -5,19 +5,7 @@ const { User } = require('../models/index');
 const { tokenExtractor, userFinder } = require('./users');
 const { Op, Sequelize } = require('sequelize');
 const Sessions = require('../models/Sessions');
-
-const blogFinder = async (req, res, next) => {
-    req.blog = await Blog.findByPk(req.params.id);
-    if (!req.blog) {
-        return res.status(404).end();
-    }
-    next();
-}
-
-const errorHandler = (error, req, res, next) => {
-    console.error(error.message);
-    return res.status(400).json({ error: error.message });
-}
+const {checkSessionToken, blogFinder, errorHandler} = require('./middlewares');
 
 
 
@@ -28,10 +16,10 @@ blogRouter.get("/", async (req, res) => {
         where = {
             [Op.or]: [
                 {
-                    title: {[Op.iLike] : `%${req.query.search}%`}
+                    title: { [Op.iLike]: `%${req.query.search}%` }
                 },
                 {
-                    author: {[Op.iLike] : `%${req.query.search}%`}
+                    author: { [Op.iLike]: `%${req.query.search}%` }
                 }
             ]
         }
@@ -44,7 +32,7 @@ blogRouter.get("/", async (req, res) => {
             model: User,
             attributes: ['name']
         },
-        order :[
+        order: [
             ['likes', 'DESC']
         ],
         where
@@ -52,13 +40,13 @@ blogRouter.get("/", async (req, res) => {
     res.status(200).json(blogs);
 })
 
-blogRouter.get('/authors', async(req, res) => {
+blogRouter.get('/authors', async (req, res) => {
     const blogs = await Blog.findAll({
-       attributes: [
-        'author', [Sequelize.literal('CAST(COUNT(id) AS INTEGER)'), 'blogs'],
-        [Sequelize.literal('CAST(SUM(likes) AS INTEGER)'), 'likes']
-       ],
-       group: ['author'],
+        attributes: [
+            'author', [Sequelize.literal('CAST(COUNT(id) AS INTEGER)'), 'blogs'],
+            [Sequelize.literal('CAST(SUM(likes) AS INTEGER)'), 'likes']
+        ],
+        group: ['author'],
     });
     res.json(blogs);
 })
@@ -69,7 +57,7 @@ blogRouter.get('/:id', blogFinder, async (req, res) => {
     res.json(req.blog);
 })
 
-blogRouter.post("/", tokenExtractor, async (req, res, next) => {
+blogRouter.post("/", tokenExtractor, checkSessionToken, async (req, res, next) => {
     const user = await User.findOne({
         where: {
             id: req.decodedToken.id
@@ -83,15 +71,7 @@ blogRouter.post("/", tokenExtractor, async (req, res, next) => {
         return res.status(404).json({ error: "Invalid user" });
     }
 
-    const sessionToken = await Sessions.findOne({
-        where : {
-            token : req.token
-        }
-    })
-    if(!sessionToken.enabled){
-        return res.status(401).json({error: "Token disabled"});
-    }
-    
+
     try {
         const blog = await Blog.create({ ...req.body, userId: req.decodedToken.id });
         return res.json(blog);
@@ -109,8 +89,8 @@ blogRouter.delete("/:id", blogFinder, tokenExtractor, userFinder, async (req, re
 });
 
 blogRouter.put('/:id', blogFinder, async (req, res, next) => {
-    if(!req.body.likes){
-        return res.status(400).json({error: "likes required"});
+    if (!req.body.likes) {
+        return res.status(400).json({ error: "likes required" });
     }
     try {
         req.blog.likes = req.body.likes;

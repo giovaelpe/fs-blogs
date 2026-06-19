@@ -7,49 +7,8 @@ const bcrypt = require('bcrypt');
 const { BCRYPT_SALT, SECRET } = require('../util/config');
 const jwt = require('jsonwebtoken');
 const { Model, where } = require('sequelize');
+const {tokenExtractor, errorHandler, userFinder} = require('./middlewares');
 
-
-
-const tokenExtractor = (req, res, next) => {
-    const authorization = req.get('authorization')
-    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        try {
-            req.decodedToken = jwt.verify(authorization.substring(7), SECRET);
-            req.token = authorization.substring(7);
-        } catch (error) {
-            return res.status(401).json({ error: 'token invalid' })
-        }
-    } else {
-        return res.status(401).json({ error: 'token missing' });
-    }
-    next();
-}
-
-const userFinder = async (req, res, next) => {
-    user = await User.findOne({
-        where: {
-            id: req.decodedToken.id
-        },
-        attributes: {
-            exclude: ['password']
-        }
-    });
-    if (!user) {
-        return res.status(404).json({ error: "Invalid user" });
-    }
-    req.user = user;
-    next();
-}
-
-
-
-const errorHandler = (error, req, res, next) => {
-    console.log(error.message);
-    if (error.errors[0] && error.errors[0].validatorKey === 'isEmail') {
-        return res.status(400).json({ error: "username must be a valid email address" })
-    }
-    res.status(400).json({ error: error.message });
-}
 
 
 userRouter.get("/", async (req, res) => {
@@ -157,9 +116,8 @@ userRouter.delete("/logout", tokenExtractor, async(req, res) => {
     if(!sessionToken){
         return res.sendStatus(404);
     }
-    sessionToken.enabled = false;
-    await sessionToken.save();
-    res.sendStatus(201);
+    await sessionToken.destroy();
+    res.sendStatus(204);
 })
 
 userRouter.put("/update", tokenExtractor, userFinder, async (req, res) => {
@@ -172,5 +130,5 @@ userRouter.use(errorHandler);
 module.exports = {
     userRouter,
     tokenExtractor,
-    userFinder
+    userFinder,
 };
