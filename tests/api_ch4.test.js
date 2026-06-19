@@ -396,7 +396,9 @@ describe('Integration: Reading Lists and Sessions', () => {
       userId: testData.users[1].id
     }
     
-    const response = await axios.post(`${baseUrl}/readinglists`, readingListEntry)
+    const response = await axios.post(`${baseUrl}/readinglists`, readingListEntry, {
+      headers: { Authorization: `Bearer ${integrationToken}` }
+    })
     
     assert.ok([200, 201].includes(response.status))
     assert.strictEqual(response.data.blog_id, integrationBlogId)

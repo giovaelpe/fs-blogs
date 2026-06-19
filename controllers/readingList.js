@@ -11,7 +11,7 @@ listRouter.get('/', async(req, res) => {
     res.json(readingList);
 })
 
-listRouter.put('/:id', tokenExtractor, async(req, res) => {
+listRouter.put('/:id', tokenExtractor, checkSessionToken, async(req, res) => {
     const listItem = await ReadingList.findByPk(req.params.id);
     if(!listItem) {
         return res.status(404).json({error: "item not found"});
