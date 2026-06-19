@@ -8,8 +8,10 @@ const User = require('./models/User.js');
 const Blog = require('./models/Blog.js');
 const { connectToDb, sequelize } = require('./util/db.js');
 const session = require('express-session');
+const { json } = require('sequelize');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const myStore = new SequelizeStore({db: sequelize, expiration: 24 * 60 *60 *1000})
+const {runMigrations} = require('./util/db.js');
 
 
 app.use(express.json());
@@ -28,16 +30,26 @@ myStore.sync();
 
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
-app.use("/api/readinglist", listRouter);
+app.use("/api/readinglists", listRouter);
 
 app.get("/", (req, res) => {
     res.sendStatus(200);
 });
 
-app.post("/api/reset", (req, res) => {
-    Blog.destroy({ where: {} });
-    User.destroy({ where: {} });
-    res.status(204).end();
+app.post("/api/reset", async(req, res) => {
+    try {
+        await sequelize.query("DROP SCHEMA public CASCADE;");
+        await sequelize.query("CREATE SCHEMA public;");
+        
+        await myStore.sync();
+        await runMigrations();
+        
+        res.sendStatus(201);
+
+    } catch(error) {
+        console.log(error.message);
+        res.status(500).json({error: "error deleting everything"});
+    }
 })
 
 const puerto = PORT || 3001;
@@ -51,3 +63,4 @@ const start = async () => {
 
 start();
 
+module.exports = app;

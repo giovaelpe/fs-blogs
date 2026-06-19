@@ -43,5 +43,6 @@ const connectToDb = async() => {
 
 module.exports = {
     sequelize,
-    connectToDb
+    connectToDb,
+    runMigrations
 };

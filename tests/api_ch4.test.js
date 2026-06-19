@@ -216,7 +216,7 @@ describe('Session Management API', () => {
   let sessionToken
 
   it('login creates a session', async () => {
-    const response = await axios.post(`${baseUrl}/login`, {
+    const response = await axios.post(`${baseUrl}/users/login`, {
       username: 'session@example.com',
       password: 'sessionpass'
     })
@@ -244,7 +244,7 @@ describe('Session Management API', () => {
   })
   
   it('logout removes user sessions', async () => {
-    const response = await axios.delete(`${baseUrl}/logout`, {
+    const response = await axios.delete(`${baseUrl}/users/logout`, {
       headers: { Authorization: `Bearer ${sessionToken}` }
     })
     
@@ -270,7 +270,7 @@ describe('Session Management API', () => {
   
   it('logout without token returns 401', async () => {
     try {
-      await axios.delete(`${baseUrl}/logout`)
+      await axios.delete(`${baseUrl}/users/logout`)
       assert.fail('Should have thrown an error')
     } catch (error) {
       assert.strictEqual(error.response.status, 401)
@@ -279,7 +279,7 @@ describe('Session Management API', () => {
   
   it('logout with invalid token returns 401', async () => {
     try {
-      await axios.delete(`${baseUrl}/logout`, {
+      await axios.delete(`${baseUrl}/users/logout`, {
         headers: { Authorization: 'Bearer invalidtoken123' }
       })
       assert.fail('Should have thrown an error')
@@ -323,7 +323,7 @@ describe('Session Management API', () => {
     await sleep(1100)
     const token = await login('session@example.com', 'sessionpass')
     
-    await axios.delete(`${baseUrl}/logout`, {
+    await axios.delete(`${baseUrl}/users/logout`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     
@@ -404,7 +404,7 @@ describe('Integration: Reading Lists and Sessions', () => {
   })
   
   it('cannot mark blog as read after session expires (logout)', async () => {
-    await axios.delete(`${baseUrl}/logout`, {
+    await axios.delete(`${baseUrl}/users/logout`, {
       headers: { Authorization: `Bearer ${integrationToken}` }
     })
     
