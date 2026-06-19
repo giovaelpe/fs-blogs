@@ -82,12 +82,6 @@ blogRouter.post("/", tokenExtractor, async (req, res, next) => {
         return res.status(404).json({ error: "Invalid user" });
     }
     
-    if(req.session.user == undefined){
-        return res.status(401).json({error: "please login first"})
-    } else if(req.session.user.username != req.decodedToken.username){
-        return res.status(401).json({error: "token has expired login again"})
-    }
-
     try {
         const blog = await Blog.create({ ...req.body, userId: req.decodedToken.id });
         return res.json(blog);
@@ -97,7 +91,7 @@ blogRouter.post("/", tokenExtractor, async (req, res, next) => {
 })
 
 blogRouter.delete("/:id", blogFinder, tokenExtractor, userFinder, async (req, res) => {
-    if (req.user.id != req.blog.userId) {
+    if (req.decodedToken.id != req.blog.userId) {
         return res.status(401).json({ error: "Not allowed" })
     }
     await req.blog.destroy();

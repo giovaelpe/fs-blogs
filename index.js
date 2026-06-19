@@ -6,25 +6,13 @@ const listRouter = require('./controllers/readingList.js');
 const { DATABASE_URL, PORT, TEST_DATABASE_URL, SECRET } = require('./util/config.js');
 const User = require('./models/User.js');
 const Blog = require('./models/Blog.js');
-const { connectToDb, sequelize } = require('./util/db.js');
-const session = require('express-session');
-const { json } = require('sequelize');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const myStore = new SequelizeStore({db: sequelize, expiration: 24 * 60 *60 *1000})
+const { connectToDb} = require('./util/db.js');
 const {runMigrations} = require('./util/db.js');
-
+const {sequelize} = require('./util/db.js');
 
 app.use(express.json());
 
-app.use(
-    session({
-        secret: SECRET,
-        store: myStore,
-        resave: false
-    })
-);
 
-myStore.sync();
 
 
 
@@ -41,7 +29,6 @@ app.post("/api/reset", async(req, res) => {
         await sequelize.query("DROP SCHEMA public CASCADE;");
         await sequelize.query("CREATE SCHEMA public;");
         
-        await myStore.sync();
         await runMigrations();
         
         res.sendStatus(201);
