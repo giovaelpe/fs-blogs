@@ -21,7 +21,8 @@ Sessions.init({
 {
     sequelize,
     underscored: true,
-    modelName: "sessions"
+    modelName: "sessions",
+    timestamps: false
 });
 
 module.exports = Sessions;
